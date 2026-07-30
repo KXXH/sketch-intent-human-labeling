@@ -28,7 +28,10 @@ test('protects an active session from a second tab', async ({ context, page }) =
   await page.goto('./')
   await page.getByLabel('Anonymous annotator ID').fill('multi-tab-user')
   await page.getByRole('button', { name: 'Begin' }).click()
-  await expect.poll(() => page.evaluate(() => Object.keys(localStorage).some((key) => key.endsWith(':lease')))).toBe(true)
+  await expect.poll(() => page.evaluate(() => {
+    const keys = Object.keys(localStorage)
+    return keys.some((key) => key.endsWith(':lease')) && keys.some((key) => key.endsWith(':main'))
+  })).toBe(true)
   const second = await context.newPage()
   await second.goto('./')
   await expect(second.getByText('This session is open in another tab.')).toBeVisible()
