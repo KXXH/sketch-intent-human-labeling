@@ -276,6 +276,7 @@ export function App() {
   return (
     <div className="app-shell">
       <header className="topbar">
+        <InstructionPanel sections={experimentConfig.instructions} effects={experimentConfig.effects} annotationPrompt={experimentConfig.annotationPrompt} />
         <div className="topbar-actions">
           <span className={`save-indicator save-${saveState}`}><i />{saveState === 'error' ? 'Save failed' : saveState === 'saving' ? 'Saving…' : 'Saved locally'}</span>
           <button type="button" className="icon-button" title="Import backup" disabled={readOnly} onClick={() => importRef.current?.click()}><Icon icon="lucide:upload" /></button>
@@ -291,7 +292,6 @@ export function App() {
       {message && <div className={`global-message ${saveState === 'error' ? 'is-error' : ''}`} role="status"><Icon icon={saveState === 'error' ? 'lucide:triangle-alert' : 'lucide:info'} /><span>{message}</span><button type="button" onClick={() => setMessage(null)} aria-label="Dismiss message"><Icon icon="lucide:x" /></button></div>}
 
       <main className="workspace">
-        <InstructionPanel sections={experimentConfig.instructions} effects={experimentConfig.effects} annotationPrompt={experimentConfig.annotationPrompt} />
         <div className="case-layout">
           <KeyframeStrip images={currentCase.imagePaths.map(assetUrl)} />
           <AnnotationForm answer={currentAnswer} effects={experimentConfig.effects} missing={validationMissing} disabled={readOnly} onChange={updateAnswer} />

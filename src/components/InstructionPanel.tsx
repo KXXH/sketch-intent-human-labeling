@@ -14,7 +14,7 @@ export function InstructionPanel({ sections, effects, annotationPrompt }: Instru
     <section className={`instruction-panel ${open ? 'is-open' : ''}`}>
       <button type="button" className="instruction-toggle" onClick={() => setOpen((value) => !value)} aria-expanded={open}>
         <span className="instruction-title"><Icon icon="lucide:notebook-tabs" /><strong>Working instructions</strong><small>{annotationPrompt}</small></span>
-        <span className="instruction-hint">{open ? 'Hide' : 'Review before annotating'} <Icon icon={open ? 'lucide:chevron-up' : 'lucide:chevron-down'} /></span>
+        <span className="instruction-hint" aria-hidden="true"><Icon icon={open ? 'lucide:chevron-up' : 'lucide:chevron-down'} /></span>
       </button>
       {open && (
         <div className="instruction-grid">

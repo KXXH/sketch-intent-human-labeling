@@ -43,7 +43,7 @@ export function AnnotationForm({ answer, effects, missing, disabled, onChange }:
               disabled={disabled}
               value={answer.targetText}
               onChange={(event) => onChange({ targetText: event.target.value })}
-              placeholder="Describe the target visual mark(s) in natural language…"
+              placeholder="Use natural language to describe the target chart element(s) intended to animate."
             />
           </div>
 
@@ -73,6 +73,7 @@ export function AnnotationForm({ answer, effects, missing, disabled, onChange }:
         <div className="form-column form-column-parameters">
           <div className={`field-group parameter-field ${hasError('duration') ? 'has-error' : ''}`}>
             <label><span>03</span> Duration <RequiredMark /></label>
+            <p className="field-description">How long the animation lasts.</p>
             <div className="segmented-choice">
               <button type="button" disabled={disabled} className={!answer.duration || answer.duration.kind === 'text' || answer.duration.kind === 'value' ? 'is-selected' : ''} onClick={() => setDuration({ kind: 'text', text: durationText })}>Describe</button>
               <button type="button" disabled={disabled} className={answer.duration?.kind === 'not_shown' ? 'is-selected' : ''} onClick={() => setDuration({ kind: 'not_shown' })}>Not shown</button>
@@ -84,6 +85,7 @@ export function AnnotationForm({ answer, effects, missing, disabled, onChange }:
 
           <div className={`field-group parameter-field ${hasError('loop') ? 'has-error' : ''}`}>
             <label><span>04</span> Loop <RequiredMark /></label>
+            <p className="field-description">How many times the animation repeats.</p>
             <div className="segmented-choice">
               <button type="button" disabled={disabled} className={!answer.loop || answer.loop.kind === 'text' || answer.loop.kind === 'value' ? 'is-selected' : ''} onClick={() => setLoop({ kind: 'text', text: loopText })}>Describe</button>
               <button type="button" disabled={disabled} className={answer.loop?.kind === 'not_shown' ? 'is-selected' : ''} onClick={() => setLoop({ kind: 'not_shown' })}>Not shown</button>

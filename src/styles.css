@@ -56,7 +56,7 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 
 /* App frame */
 .app-shell { min-height: 100vh; color: var(--ink); }
-.topbar { min-height: 54px; position: sticky; top: 0; z-index: 30; display: flex; align-items: center; justify-content: flex-end; gap: 24px; padding: 8px 28px; background: rgba(248,246,239,.96); border-bottom: 1px solid var(--ink); backdrop-filter: blur(12px); }
+.topbar { min-height: 54px; position: sticky; top: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 8px 28px; background: rgba(248,246,239,.96); border-bottom: 1px solid var(--ink); backdrop-filter: blur(12px); }
 .brand-lockup { display: flex; align-items: center; gap: 12px; }
 .brand-index { width: 37px; height: 37px; display: grid; place-content: center; border: 1px solid var(--ink); font: 500 8px/1.1 "IBM Plex Mono"; }
 .brand-lockup div { display: flex; flex-direction: column; }
@@ -81,19 +81,22 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 
 /* Instructions and progress */
 .instruction-panel { margin-bottom: 16px; border: 1px solid var(--rule); background: var(--paper); }
+.topbar > .instruction-panel { position: relative; flex: 1 1 auto; min-width: 0; margin: 0; border: 0; background: transparent; }
+.topbar .instruction-toggle { width: auto; max-width: 100%; min-height: 38px; padding: 0 12px; border: 1px solid var(--rule); background: var(--paper); }
+.topbar .instruction-grid { position: absolute; top: calc(100% + 8px); left: 0; z-index: 60; width: min(1050px, calc(100vw - 40px)); max-height: calc(100vh - 84px); overflow: auto; border: 1px solid var(--ink); background: var(--paper); box-shadow: 8px 8px 0 rgba(23,33,30,.12); }
 .instruction-toggle { width: 100%; min-height: 54px; display: flex; align-items: center; justify-content: space-between; border: 0; background: none; padding: 0 18px; cursor: pointer; }
 .instruction-toggle > span { display: flex; align-items: center; gap: 10px; font-weight: 600; }
 .instruction-toggle .instruction-title { flex: 1; min-width: 0; justify-content: flex-start; text-align: left; }
 .instruction-title strong { flex: 0 0 auto; }
-.instruction-title small { min-width: 0; overflow: hidden; color: var(--muted); font: 400 11px/1.35 "IBM Plex Sans"; text-overflow: ellipsis; white-space: nowrap; }
-.instruction-toggle .instruction-hint { color: var(--muted); font: 400 11px "IBM Plex Mono"; }
+.instruction-title small { min-width: 0; overflow: hidden; color: var(--muted); font: 400 12px/1.35 "IBM Plex Sans"; text-overflow: ellipsis; white-space: nowrap; }
+.instruction-toggle .instruction-hint { width: 24px; flex: 0 0 24px; display: grid; place-items: center; color: var(--muted); font-size: 14px; }
 .instruction-grid { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--rule); }
 .instruction-grid article { position: relative; padding: 24px; min-height: 190px; }
 .instruction-grid article + article { border-left: 1px solid var(--rule); }
 .instruction-index { color: var(--teal); font: 500 11px "IBM Plex Mono"; }
 .instruction-grid h3 { margin: 28px 0 10px; font-size: 15px; }
 .instruction-grid p, .instruction-grid li { color: #53605b; font-size: 12px; line-height: 1.55; }
-.instruction-grid ul { padding-left: 17px; margin-bottom: 0; }
+.instruction-grid ul { padding-left: 0; margin-bottom: 0; list-style: none; }
 .effect-glossary { grid-column: 1 / -1; border-top: 1px solid var(--rule); padding: 20px 24px 24px; }
 .effect-glossary-heading { display: flex; align-items: flex-start; gap: 18px; margin-bottom: 16px; }
 .effect-glossary-heading h3 { margin: 0 0 4px; font-size: 15px; }
@@ -114,9 +117,9 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .case-layout .form-column { padding: 18px 0 8px; }
 .case-layout .form-column + .form-column { border-left: 0; border-top: 1px solid var(--rule); padding: 18px 0 8px; }
 .case-layout .effect-grid { grid-template-columns: 1fr; gap: 5px; }
-.case-layout .effect-grid button { min-height: 58px; padding: 9px 10px; gap: 4px; }
-.case-layout .effect-grid button strong { font-size: 11px; }
-.case-layout .effect-grid button small { font-size: 11px; line-height: 1.3; }
+.case-layout .effect-grid button { min-height: 42px; flex-direction: row; align-items: center; padding: 7px 34px 7px 10px; gap: 10px; }
+.case-layout .effect-grid button strong { flex: 0 0 72px; font-size: 11px; }
+.case-layout .effect-grid button small { min-width: 0; overflow: hidden; flex: 1; font-size: 10px; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
 .section-heading p { margin: 0; color: var(--muted); font: 400 11px "IBM Plex Mono"; }
 .filmstrip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--ink); background: #dad6ca; gap: 1px; }
 .frame-card { margin: 0; min-width: 0; background: var(--paper); }
@@ -142,8 +145,9 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .field-group { position: relative; margin-bottom: 28px; }
 .field-group > label > span { color: var(--teal); font-weight: 500; }
 .required-mark, .field-group label em { margin-left: auto; color: var(--muted); font: 400 8px "IBM Plex Mono"; letter-spacing: .08em; font-style: normal; }
+.field-description { margin: -3px 0 8px; color: var(--muted); font-size: 11px; line-height: 1.35; }
 .field-group textarea { width: 100%; resize: vertical; border: 1px solid #999c96; background: #fff; padding: 13px 14px; line-height: 1.5; transition: border-color .16s, box-shadow .16s; }
-.field-group #target-text { min-height: 74px; max-height: 112px; }
+.field-group #target-text { min-height: 58px; max-height: 88px; }
 .field-group textarea:focus { border-color: var(--teal); box-shadow: inset 4px 0 0 var(--teal); }
 .field-group.has-error textarea, .field-group.has-error .effect-grid, .field-group.has-error .segmented-choice, .field-group.has-error .confidence-scale { outline: 2px solid #c9574d; outline-offset: 3px; }
 .effect-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
@@ -173,7 +177,7 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 
 @media (max-width: 760px) {
   .start-panel { padding: 90px 24px 40px; }.start-panel h1 { font-size: 50px; }.start-input-row { grid-template-columns: 1fr; }.start-input-row input { border-right: 1px solid var(--ink); border-bottom: 0; }
-  .topbar { padding: 9px 14px; }.topbar .button-quiet, .save-indicator { display: none; }.workspace { width: calc(100% - 20px); margin-top: 10px; }.instruction-title small { display: none; }.section-heading { align-items: flex-start; flex-direction: column; }.instruction-grid { grid-template-columns: 1fr; }.instruction-grid > article + article { border-left: 0; border-top: 1px solid var(--rule); }.effect-glossary { padding: 18px; }.effect-glossary-grid { grid-template-columns: 1fr; }.effect-grid { grid-template-columns: 1fr; }.form-column-parameters { grid-template-columns: 1fr; }.form-column-parameters .field-group { grid-column: 1; }.case-navigation { grid-template-columns: 1fr 1fr; }.navigation-progress { grid-column: 1 / -1; grid-row: 1; }.navigation-previous { grid-column: 1; grid-row: 2; }.navigation-skip { grid-column: 2; grid-row: 2; }.navigation-next { grid-column: 1 / -1; grid-row: 3; }.case-navigation .button { padding-inline: 8px; font-size: 12px; }
+  .topbar { padding: 9px 14px; }.topbar .button-quiet, .save-indicator { display: none; }.topbar .instruction-grid { width: calc(100vw - 28px); }.workspace { width: calc(100% - 20px); margin-top: 10px; }.instruction-title small { display: none; }.section-heading { align-items: flex-start; flex-direction: column; }.instruction-grid { grid-template-columns: 1fr; }.instruction-grid > article + article { border-left: 0; border-top: 1px solid var(--rule); }.effect-glossary { padding: 18px; }.effect-glossary-grid { grid-template-columns: 1fr; }.effect-grid { grid-template-columns: 1fr; }.form-column-parameters { grid-template-columns: 1fr; }.form-column-parameters .field-group { grid-column: 1; }.case-navigation { grid-template-columns: 1fr 1fr; }.navigation-progress { grid-column: 1 / -1; grid-row: 1; }.navigation-previous { grid-column: 1; grid-row: 2; }.navigation-skip { grid-column: 2; grid-row: 2; }.navigation-next { grid-column: 1 / -1; grid-row: 3; }.case-navigation .button { padding-inline: 8px; font-size: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
