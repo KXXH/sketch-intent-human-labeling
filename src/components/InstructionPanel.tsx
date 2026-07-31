@@ -36,7 +36,6 @@ export function InstructionPanel({ sections, effects }: InstructionPanelProps) {
             <div className="effect-glossary-grid">
               {effects.map((effect) => (
                 <article key={effect.id}>
-                  <Icon icon={effect.icon} aria-hidden="true" />
                   <div><strong>{effect.label}</strong><p>{effect.definition}</p></div>
                 </article>
               ))}

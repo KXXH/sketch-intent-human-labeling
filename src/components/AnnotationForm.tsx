@@ -1,4 +1,3 @@
-import { Icon } from '@iconify/react'
 import type { CaseAnswer, DurationAnswer, LoopAnswer } from '../domain/types'
 import type { EffectDefinition, EffectId } from '../experiment/types'
 
@@ -44,7 +43,7 @@ export function AnnotationForm({ answer, effects, missing, disabled, onChange }:
               disabled={disabled}
               value={answer.targetText}
               onChange={(event) => onChange({ targetText: event.target.value })}
-              placeholder="Describe the visual mark(s), enter SVG class IDs, or use both…"
+              placeholder="Describe the target visual mark(s) in natural language…"
             />
             <p className="field-note">Visual marks only — not axes, titles, labels, grid lines, or legends.</p>
           </div>
@@ -63,10 +62,9 @@ export function AnnotationForm({ answer, effects, missing, disabled, onChange }:
                   title={effect.definition}
                   onClick={() => onChange({ effect: effect.id as EffectId })}
                 >
-                  <Icon icon={effect.icon} />
                   <strong>{effect.label}</strong>
                   <small>{effect.definition}</small>
-                  <i aria-hidden="true"><Icon icon="lucide:check" /></i>
+                  <i aria-hidden="true" />
                 </button>
               ))}
             </div>
@@ -77,22 +75,22 @@ export function AnnotationForm({ answer, effects, missing, disabled, onChange }:
           <div className={`field-group parameter-field ${hasError('duration') ? 'has-error' : ''}`}>
             <label><span>03</span> Duration <RequiredMark /></label>
             <div className="segmented-choice">
-              <button type="button" disabled={disabled} className={answer.duration?.kind === 'text' || answer.duration?.kind === 'value' ? 'is-selected' : ''} onClick={() => setDuration({ kind: 'text', text: durationText })}>Describe</button>
+              <button type="button" disabled={disabled} className={!answer.duration || answer.duration.kind === 'text' || answer.duration.kind === 'value' ? 'is-selected' : ''} onClick={() => setDuration({ kind: 'text', text: durationText })}>Describe</button>
               <button type="button" disabled={disabled} className={answer.duration?.kind === 'not_shown' ? 'is-selected' : ''} onClick={() => setDuration({ kind: 'not_shown' })}>Not shown</button>
             </div>
-            {(answer.duration?.kind === 'text' || answer.duration?.kind === 'value') && (
-              <input className="text-input" type="text" disabled={disabled} value={durationText} onChange={(event) => setDuration({ kind: 'text', text: event.target.value })} placeholder="e.g. about 1.5 seconds" />
+            {(!answer.duration || answer.duration.kind === 'text' || answer.duration.kind === 'value') && (
+              <div className="text-input-with-suffix"><input className="text-input" type="text" disabled={disabled} value={durationText.replace(/\s*seconds?\s*$/i, '')} onChange={(event) => setDuration({ kind: 'text', text: event.target.value })} placeholder="e.g. about 1.5" /><span>seconds</span></div>
             )}
           </div>
 
           <div className={`field-group parameter-field ${hasError('loop') ? 'has-error' : ''}`}>
             <label><span>04</span> Loop <RequiredMark /></label>
             <div className="segmented-choice">
-              <button type="button" disabled={disabled} className={answer.loop?.kind === 'text' || answer.loop?.kind === 'value' ? 'is-selected' : ''} onClick={() => setLoop({ kind: 'text', text: loopText })}>Describe</button>
+              <button type="button" disabled={disabled} className={!answer.loop || answer.loop.kind === 'text' || answer.loop.kind === 'value' ? 'is-selected' : ''} onClick={() => setLoop({ kind: 'text', text: loopText })}>Describe</button>
               <button type="button" disabled={disabled} className={answer.loop?.kind === 'not_shown' ? 'is-selected' : ''} onClick={() => setLoop({ kind: 'not_shown' })}>Not shown</button>
             </div>
-            {(answer.loop?.kind === 'text' || answer.loop?.kind === 'value') && (
-              <input className="text-input" type="text" disabled={disabled} value={loopText} onChange={(event) => setLoop({ kind: 'text', text: event.target.value })} placeholder="e.g. repeats three times" />
+            {(!answer.loop || answer.loop.kind === 'text' || answer.loop.kind === 'value') && (
+              <div className="text-input-with-suffix"><input className="text-input" type="text" disabled={disabled} value={loopText.replace(/\s+(?:time|times)\s*$/i, '')} onChange={(event) => setLoop({ kind: 'text', text: event.target.value })} placeholder="e.g. 3" /><span>times</span></div>
             )}
           </div>
 

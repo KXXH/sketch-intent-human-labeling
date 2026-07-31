@@ -2,11 +2,10 @@ import { Icon } from '@iconify/react'
 import { useEffect, useState } from 'react'
 
 interface KeyframeStripProps {
-  caseId: string
   images: string[]
 }
 
-export function KeyframeStrip({ caseId, images }: KeyframeStripProps) {
+export function KeyframeStrip({ images }: KeyframeStripProps) {
   const [expanded, setExpanded] = useState<number | null>(null)
 
   useEffect(() => {
@@ -24,7 +23,7 @@ export function KeyframeStrip({ caseId, images }: KeyframeStripProps) {
     <section className="keyframe-section" aria-labelledby="keyframe-title">
       <div className="section-heading">
         <div>
-          <div className="eyebrow">Visual evidence · {caseId}</div>
+          <div className="eyebrow">Visual evidence</div>
           <h2 id="keyframe-title">Sketch sequence</h2>
         </div>
         <p>Frame 1 is clean. Frame 4 is complete.</p>
@@ -33,7 +32,7 @@ export function KeyframeStrip({ caseId, images }: KeyframeStripProps) {
         {images.map((source, index) => (
           <figure key={source} className="frame-card">
             <button type="button" onClick={() => setExpanded(index)} aria-label={`Enlarge frame ${index + 1}`}>
-              <img src={source} alt={`Keyframe ${index + 1} of 4 for ${caseId}`} draggable={false} />
+              <img src={source} alt={`Keyframe ${index + 1} of 4`} draggable={false} />
               <span className="zoom-cue"><Icon icon="lucide:maximize-2" /> Enlarge</span>
             </button>
             <figcaption><span>FRAME</span> 0{index + 1}<i />{index === 0 ? 'Original' : index === images.length - 1 ? 'Complete' : 'Process'}</figcaption>

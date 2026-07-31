@@ -256,16 +256,13 @@ export function App() {
         <ProgressGrid caseOrder={session.caseOrder} answers={session.answers} currentCaseId={session.currentCaseId} disabled={readOnly} onSelect={navigate} />
 
         <div className="case-rule"><span>CASE {String(currentIndex + 1).padStart(2, '0')}</span><i /><strong>{complete}/{total} complete</strong>{skipped > 0 && <em>{skipped} to revisit</em>}</div>
-        <KeyframeStrip caseId={currentCase.id} images={currentCase.imagePaths.map(assetUrl)} />
-        <AnnotationForm answer={currentAnswer} effects={experimentConfig.effects} missing={validationMissing} disabled={readOnly} onChange={updateAnswer} />
+        <div className="case-layout">
+          <KeyframeStrip images={currentCase.imagePaths.map(assetUrl)} />
+          <AnnotationForm answer={currentAnswer} effects={experimentConfig.effects} missing={validationMissing} disabled={readOnly} onChange={updateAnswer} />
+        </div>
 
         <nav className="case-navigation" aria-label="Case navigation">
           <button className="button button-quiet" type="button" disabled={readOnly || currentIndex === 0} onClick={() => navigate(session.caseOrder[currentIndex - 1])}><Icon icon="lucide:arrow-left" /> Previous</button>
-          <div className="navigation-status">
-            <span>{Math.round((complete / total) * 100)}%</span>
-            <div><i style={{ width: `${(complete / total) * 100}%` }} /></div>
-            <small>{total - complete} remaining</small>
-          </div>
           <button className="button button-skip" type="button" disabled={readOnly} onClick={skipCurrent}><Icon icon="lucide:bookmark" /> Skip for now</button>
           <button className="button button-primary" type="button" disabled={readOnly} onClick={completeCurrent}>{currentIndex === total - 1 ? 'Complete case' : 'Save & next'} <Icon icon="lucide:arrow-right" /></button>
         </nav>
