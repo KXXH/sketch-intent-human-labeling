@@ -50,7 +50,7 @@ export function App() {
       setMessage(error instanceof Error ? `Automatic save failed: ${error.message}` : 'Automatic save failed.')
       return false
     }
-  }, [])
+  }, [ownsLease])
 
   useEffect(() => { sessionRef.current = session }, [session])
 
