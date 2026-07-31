@@ -23,7 +23,6 @@ export interface EffectDefinition {
   id: EffectId
   label: string
   definition: string
-  icon: string
 }
 
 export interface ExperimentCase {
