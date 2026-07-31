@@ -304,7 +304,6 @@ export function App() {
           <button className="button button-primary navigation-next" type="button" disabled={readOnly} onClick={completeCurrent}>{currentIndex === total - 1 && complete === total - 1 && skipped === 0 ? 'Complete case' : 'Save & next'} <Icon icon="lucide:arrow-right" /></button>
         </nav>
       </main>
-      <footer><span>No network connection · no analytics · local browser storage</span></footer>
     </div>
   )
 }
