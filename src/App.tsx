@@ -264,7 +264,7 @@ export function App() {
   }
 
   if (!session) {
-    return <StartScreen datasetTitle={experimentConfig.title} caseCount={experimentConfig.cases.length} error={saveState === 'error' ? message : null} onStart={start} onImport={handleImport} />
+    return <StartScreen error={saveState === 'error' ? message : null} onStart={start} onImport={handleImport} />
   }
 
   if (!currentCase || !currentAnswer) return null

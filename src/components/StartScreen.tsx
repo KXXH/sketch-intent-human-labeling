@@ -2,14 +2,12 @@ import { Icon } from '@iconify/react'
 import { useRef, useState } from 'react'
 
 interface StartScreenProps {
-  datasetTitle: string
-  caseCount: number
   error: string | null
   onStart: (annotatorId: string) => void
   onImport: (file: File) => void
 }
 
-export function StartScreen({ datasetTitle, caseCount, error, onStart, onImport }: StartScreenProps) {
+export function StartScreen({ error, onStart, onImport }: StartScreenProps) {
   const [annotatorId, setAnnotatorId] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -22,21 +20,7 @@ export function StartScreen({ datasetTitle, caseCount, error, onStart, onImport 
   return (
     <main className="start-shell">
       <section className="start-panel" aria-labelledby="start-title">
-        <div className="start-mark" aria-hidden="true">
-          <span>HI</span>
-          <span>01</span>
-        </div>
-        <div className="eyebrow">Human interpretation study</div>
         <h1 id="start-title">Read the sketch.<br />Name the motion.</h1>
-        <p className="start-lede">
-          You will inspect four keyframes for each case and record the animation intent you believe the sketch communicates.
-        </p>
-
-        <dl className="start-facts">
-          <div><dt>Dataset</dt><dd>{datasetTitle}</dd></div>
-          <div><dt>Cases</dt><dd>{caseCount} · resume anytime</dd></div>
-          <div><dt>Privacy</dt><dd>Stored only in this browser</dd></div>
-        </dl>
 
         {error && <div className="alert alert-error" role="alert"><Icon icon="lucide:triangle-alert" />{error}</div>}
 
@@ -76,12 +60,6 @@ export function StartScreen({ datasetTitle, caseCount, error, onStart, onImport 
           }}
         />
       </section>
-      <aside className="start-aside" aria-hidden="true">
-        <div className="sequence-glyph">
-          {[0, 1, 2, 3].map((index) => <span key={index} style={{ '--i': index } as React.CSSProperties}>{index + 1}</span>)}
-        </div>
-        <div className="aside-caption">Observe change<br />across time</div>
-      </aside>
     </main>
   )
 }
