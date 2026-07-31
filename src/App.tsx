@@ -14,13 +14,17 @@ import { downloadSession, loadSession, parseImportedSession, persistSession, Sto
 type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 const LAST_ANNOTATOR_KEY = `human-labeling:${experimentConfig.datasetId}:${experimentConfig.datasetVersion}:last-annotator`
 
+function readLastAnnotator(): string | null {
+  try { return localStorage.getItem(LAST_ANNOTATOR_KEY) } catch { return null }
+}
+
 function assetUrl(relativePath: string): string {
   return encodeURI(`${import.meta.env.BASE_URL}datasets/${experimentConfig.datasetId}/${relativePath}`)
 }
 
 export function App() {
   const [session, setSession] = useState<AnnotationSessionData | null>(() => {
-    const lastAnnotator = localStorage.getItem(LAST_ANNOTATOR_KEY)
+    const lastAnnotator = readLastAnnotator()
     return lastAnnotator ? loadSession(experimentConfig, lastAnnotator).session : null
   })
   const [saveState, setSaveState] = useState<SaveState>('idle')
@@ -29,9 +33,14 @@ export function App() {
   const sessionRef = useRef<AnnotationSessionData | null>(null)
   const activeStartedAt = useRef(Date.now())
   const importRef = useRef<HTMLInputElement>(null)
-  const { readOnly, takeOver } = useSessionLease(experimentConfig, session?.annotatorId ?? null)
+  const { readOnly, ownsLease, takeOver } = useSessionLease(experimentConfig, session?.annotatorId ?? null)
 
   const persistNow = useCallback((value: AnnotationSessionData) => {
+    if (!ownsLease()) {
+      setSaveState('error')
+      setMessage('Saving stopped because this tab no longer owns the session. Take over here or export a backup from the active tab.')
+      return false
+    }
     try {
       setSaveState('saving')
       persistSession(value, experimentConfig)
@@ -47,10 +56,10 @@ export function App() {
   useEffect(() => { sessionRef.current = session }, [session])
 
   useEffect(() => {
-    if (!session) return
+    if (!session || readOnly) return
     const timeout = window.setTimeout(() => persistNow(session), 180)
     return () => window.clearTimeout(timeout)
-  }, [persistNow, session])
+  }, [persistNow, readOnly, session])
 
   const addElapsedTime = useCallback((value: AnnotationSessionData): AnnotationSessionData => {
     const elapsed = document.visibilityState === 'visible' ? Math.max(0, Date.now() - activeStartedAt.current) : 0
@@ -68,6 +77,7 @@ export function App() {
       if (!current || readOnly) return
       const timed = addElapsedTime(current)
       sessionRef.current = timed
+      setSession((latest) => latest?.sessionId === timed.sessionId ? timed : latest)
       persistNow(timed)
     }
     const onVisibility = () => {
@@ -75,30 +85,32 @@ export function App() {
       else activeStartedAt.current = Date.now()
     }
     window.addEventListener('beforeunload', flush)
+    window.addEventListener('pagehide', flush)
     window.addEventListener('blur', flush)
     document.addEventListener('visibilitychange', onVisibility)
     return () => {
       window.removeEventListener('beforeunload', flush)
+      window.removeEventListener('pagehide', flush)
       window.removeEventListener('blur', flush)
       document.removeEventListener('visibilitychange', onVisibility)
     }
   }, [addElapsedTime, persistNow, readOnly, session])
 
   const mutate = useCallback((mutator: (current: AnnotationSessionData) => AnnotationSessionData) => {
-    if (readOnly) return
+    if (readOnly || !ownsLease()) return
     setSession((current) => {
       if (!current) return current
       const next = mutator(current)
       const now = new Date().toISOString()
       return { ...next, updatedAt: now, revision: current.revision + 1 }
     })
-  }, [readOnly])
+  }, [ownsLease, readOnly])
 
   const start = (annotatorId: string) => {
     const normalized = annotatorId.trim()
     const loaded = loadSession(experimentConfig, normalized)
     const next = loaded.session ?? createSession(experimentConfig, normalized)
-    localStorage.setItem(LAST_ANNOTATOR_KEY, normalized)
+    try { localStorage.setItem(LAST_ANNOTATOR_KEY, normalized) } catch { /* The session save will surface storage failures. */ }
     setSession(next)
     setMessage(loaded.recovered ? 'The primary save was unavailable. Progress was restored from a verified recovery snapshot.' : null)
     setValidationMissing([])
@@ -106,17 +118,34 @@ export function App() {
   }
 
   const handleImport = async (file: File) => {
+    if (session && (readOnly || !ownsLease())) {
+      setMessage('Import is disabled in this read-only tab. Take over the session before replacing its data.')
+      return
+    }
     try {
       const imported = parseImportedSession(await file.text(), experimentConfig)
-      persistSession(imported, experimentConfig)
-      localStorage.setItem(LAST_ANNOTATOR_KEY, imported.annotatorId)
       setSession(imported)
-      setMessage(`Restored revision ${imported.revision} for ${imported.annotatorId}.`)
-      setSaveState('saved')
+      try { localStorage.setItem(LAST_ANNOTATOR_KEY, imported.annotatorId) } catch { /* The session save will surface storage failures. */ }
+      setMessage(`Loaded revision ${imported.revision} for ${imported.annotatorId}; saving locally…`)
+      setSaveState('saving')
       activeStartedAt.current = Date.now()
     } catch (error) {
       setMessage(error instanceof StorageError ? error.message : 'Unable to import this backup.')
       if (!session) setSaveState('error')
+    }
+  }
+
+  const takeOverHere = async () => {
+    const claimed = await takeOver()
+    if (!claimed || !session) return
+    const latest = loadSession(experimentConfig, session.annotatorId).session
+    if (latest) {
+      sessionRef.current = latest
+      setSession(latest)
+      activeStartedAt.current = Date.now()
+      setMessage(latest.revision > session.revision ? 'This tab took over and restored the latest saved revision.' : 'This tab now owns the session.')
+    } else {
+      setMessage('This tab now owns the session. The current draft will be saved locally.')
     }
   }
 
@@ -218,7 +247,11 @@ export function App() {
   }
 
   const finalize = () => {
-    if (!session || !canFinalize(session)) {
+    if (!session || readOnly || !ownsLease()) {
+      setMessage('Final export is locked while this tab is read-only. Take over the session first.')
+      return
+    }
+    if (!canFinalize(session)) {
       setMessage('Final export is locked until all 80 cases are complete. Draft export remains available.')
       return
     }
@@ -247,15 +280,15 @@ export function App() {
         <div className="session-meta"><span>DATASET <strong>{session.datasetVersion}</strong></span><span>ANNOTATOR <strong>{session.annotatorId}</strong></span></div>
         <div className="topbar-actions">
           <span className={`save-indicator save-${saveState}`}><i />{saveState === 'error' ? 'Save failed' : saveState === 'saving' ? 'Saving…' : 'Saved locally'}</span>
-          <button type="button" className="icon-button" title="Import backup" onClick={() => importRef.current?.click()}><Icon icon="lucide:upload" /></button>
+          <button type="button" className="icon-button" title="Import backup" disabled={readOnly} onClick={() => importRef.current?.click()}><Icon icon="lucide:upload" /></button>
           <button type="button" className="button button-quiet" onClick={() => downloadSession(addElapsedTime(session), false)}><Icon icon="lucide:download" /> Draft</button>
-          <button type="button" className="button button-primary compact" onClick={finalize} disabled={!canFinalize(session)}><Icon icon="lucide:badge-check" /> Final export</button>
+          <button type="button" className="button button-primary compact" onClick={finalize} disabled={readOnly || !canFinalize(session)}><Icon icon="lucide:badge-check" /> Final export</button>
           <input ref={importRef} className="sr-only" type="file" accept="application/json,.json" onChange={(event) => { const file = event.target.files?.[0]; if (file) void handleImport(file); event.target.value = '' }} />
         </div>
       </header>
 
       {readOnly && (
-        <div className="conflict-banner" role="alert"><Icon icon="lucide:panels-top-left" /><div><strong>This session is open in another tab.</strong><span>This copy is read-only to prevent data loss.</span></div><button type="button" onClick={takeOver}>Take over here</button></div>
+        <div className="conflict-banner" role="alert"><Icon icon="lucide:panels-top-left" /><div><strong>This session is open in another tab.</strong><span>This copy is read-only to prevent data loss.</span></div><button type="button" onClick={() => void takeOverHere()}>Take over here</button></div>
       )}
       {message && <div className={`global-message ${saveState === 'error' ? 'is-error' : ''}`} role="status"><Icon icon={saveState === 'error' ? 'lucide:triangle-alert' : 'lucide:info'} /><span>{message}</span><button type="button" onClick={() => setMessage(null)} aria-label="Dismiss message"><Icon icon="lucide:x" /></button></div>}
 

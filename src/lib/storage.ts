@@ -6,6 +6,39 @@ const SNAPSHOT_COUNT = 5
 
 export class StorageError extends Error {}
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
+}
+
+function isIsoString(value: unknown): value is string {
+  return typeof value === 'string' && Number.isFinite(Date.parse(value))
+}
+
+function isCaseAnswer(value: unknown, effectIds: Set<string>): boolean {
+  if (!isRecord(value)) return false
+  if (!['in_progress', 'skipped', 'completed'].includes(String(value.status))) return false
+  if (typeof value.targetText !== 'string' || typeof value.explanation !== 'string') return false
+  if (value.effect !== null && (typeof value.effect !== 'string' || !effectIds.has(value.effect))) return false
+  if (value.confidence !== null && (!Number.isInteger(value.confidence) || Number(value.confidence) < 1 || Number(value.confidence) > 7)) return false
+  if (!isIsoString(value.firstViewedAt) || !isIsoString(value.lastUpdatedAt)) return false
+  if (typeof value.activeTimeMs !== 'number' || !Number.isFinite(value.activeTimeMs) || value.activeTimeMs < 0) return false
+
+  for (const parameter of [value.duration, value.loop]) {
+    if (parameter === null) continue
+    if (!isRecord(parameter) || typeof parameter.kind !== 'string') return false
+    if (parameter.kind === 'text' && typeof parameter.text === 'string') continue
+    if (parameter.kind === 'not_shown') continue
+    if (parameter.kind === 'value' && typeof parameter.seconds === 'number' && Number.isFinite(parameter.seconds)) continue
+    if (parameter.kind === 'value' && typeof parameter.count === 'number' && Number.isInteger(parameter.count) && parameter.count > 0) continue
+    return false
+  }
+  return true
+}
+
+function safeGet(storage: Storage, key: string): string | null {
+  try { return storage.getItem(key) } catch { return null }
+}
+
 function storagePrefix(config: ExperimentConfig, annotatorId: string): string {
   return `human-labeling:${config.datasetId}:${config.datasetVersion}:${encodeURIComponent(annotatorId)}`
 }
@@ -20,20 +53,36 @@ export function sealSession(session: AnnotationSessionData): AnnotationExport {
 }
 
 export function verifyExport(value: unknown, config: ExperimentConfig): value is AnnotationExport {
-  if (!value || typeof value !== 'object') return false
-  const payload = value as AnnotationExport
+  if (!isRecord(value)) return false
+  const payload = value as unknown as AnnotationExport
   if (
     payload.schemaVersion !== 1 ||
     payload.datasetId !== config.datasetId ||
     payload.datasetVersion !== config.datasetVersion ||
     typeof payload.annotatorId !== 'string' ||
+    !payload.annotatorId.trim() ||
+    typeof payload.sessionId !== 'string' ||
+    !payload.sessionId.trim() ||
     !Array.isArray(payload.caseOrder) ||
-    typeof payload.answers !== 'object' ||
+    typeof payload.currentCaseId !== 'string' ||
+    !isIsoString(payload.createdAt) ||
+    !isIsoString(payload.updatedAt) ||
+    (payload.completedAt !== null && !isIsoString(payload.completedAt)) ||
+    !Number.isInteger(payload.revision) ||
+    payload.revision < 0 ||
+    !isRecord(payload.answers) ||
     typeof payload.checksum !== 'string'
   ) return false
 
   const expectedIds = new Set(config.cases.map((item) => item.id))
-  if (payload.caseOrder.length !== expectedIds.size || payload.caseOrder.some((id) => !expectedIds.has(id))) return false
+  if (
+    payload.caseOrder.length !== expectedIds.size ||
+    new Set(payload.caseOrder).size !== payload.caseOrder.length ||
+    payload.caseOrder.some((id) => typeof id !== 'string' || !expectedIds.has(id)) ||
+    !expectedIds.has(payload.currentCaseId)
+  ) return false
+  const effectIds = new Set(config.effects.map((effect) => effect.id))
+  if (Object.entries(payload.answers).some(([id, answer]) => !expectedIds.has(id) || !isCaseAnswer(answer, effectIds))) return false
   return checksum(withoutChecksum(payload)) === payload.checksum
 }
 
@@ -52,7 +101,7 @@ export function persistSession(
       const previous = storage.getItem(`${prefix}:snapshot:${index - 1}`)
       if (previous) storage.setItem(`${prefix}:snapshot:${index}`, previous)
     }
-    const current = storage.getItem(`${prefix}:main`)
+    const current = safeGet(storage, `${prefix}:main`)
     if (current) storage.setItem(`${prefix}:snapshot:0`, current)
     storage.setItem(`${prefix}:main`, serialized)
     storage.removeItem(`${prefix}:staging`)
@@ -75,7 +124,7 @@ export function loadSession(
   ]
   const candidates: AnnotationExport[] = []
   for (const key of keys) {
-    const serialized = storage.getItem(key)
+    const serialized = safeGet(storage, key)
     if (!serialized) continue
     try {
       const parsed = JSON.parse(serialized)
@@ -87,7 +136,7 @@ export function loadSession(
   if (!candidates.length) return { session: null, recovered: false }
   candidates.sort((left, right) => Date.parse(right.updatedAt) - Date.parse(left.updatedAt) || right.revision - left.revision)
   const selected = candidates[0]
-  const main = storage.getItem(`${prefix}:main`)
+  const main = safeGet(storage, `${prefix}:main`)
   const recovered = !main || main !== JSON.stringify(selected)
   return { session: withoutChecksum(selected), recovered }
 }
