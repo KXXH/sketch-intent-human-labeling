@@ -125,12 +125,9 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .progress-legend { display: flex; gap: 14px; color: var(--muted); font: 400 8px "IBM Plex Mono"; }
 .progress-legend span { display: flex; align-items: center; gap: 5px; }.progress-legend i { width: 7px; height: 7px; border: 1px solid var(--rule); }
 .legend-active { background: var(--teal-soft); border-color: var(--teal) !important; }.legend-skipped { background: var(--amber-soft); border-color: var(--amber) !important; }.legend-complete { background: var(--teal) !important; border-color: var(--teal) !important; }
-.progress-ledger { padding: 9px 14px 11px; overflow-x: auto; }
-.progress-row { display: grid; grid-template-columns: 45px minmax(920px, 1fr); align-items: center; gap: 9px; }
-.progress-row + .progress-row { margin-top: 4px; }
-.progress-row-label { color: var(--muted); font: 400 7px "IBM Plex Mono"; letter-spacing: .04em; }
-.progress-grid { display: grid; grid-template-columns: repeat(40, minmax(22px, 1fr)); border: 1px solid #bcb9af; background: #d8d5cb; gap: 1px; }
-.progress-cell { position: relative; min-width: 0; height: 21px; border: 0; background: #f5f3ec; color: #817f77; cursor: pointer; font: 400 clamp(6px,.45vw,8px) "IBM Plex Mono"; transition: color .14s, background .14s; }
+.progress-ledger { padding: 6px 12px 8px; overflow-x: auto; }
+.progress-grid { display: grid; grid-template-columns: repeat(80, minmax(14px, 1fr)); min-width: 1120px; border: 1px solid #bcb9af; background: #d8d5cb; gap: 1px; }
+.progress-cell { position: relative; min-width: 0; height: 18px; border: 0; background: #f5f3ec; color: #817f77; cursor: pointer; font: 400 clamp(6px,.42vw,8px) "IBM Plex Mono"; transition: color .14s, background .14s; }
 .progress-cell:nth-child(10n + 1):not(:first-child) { box-shadow: -2px 0 0 var(--ink); }
 .progress-cell:hover:not(:disabled) { color: var(--ink); background: #fff; z-index: 2; }
 .progress-cell.status-in_progress { background: repeating-linear-gradient(135deg, var(--teal-soft) 0 4px, #d7e7e1 4px 6px); color: var(--teal-dark); }
