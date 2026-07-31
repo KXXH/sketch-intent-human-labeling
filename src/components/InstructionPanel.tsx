@@ -5,14 +5,15 @@ import type { EffectDefinition, InstructionSection } from '../experiment/types'
 interface InstructionPanelProps {
   sections: InstructionSection[]
   effects: EffectDefinition[]
+  annotationPrompt: string
 }
 
-export function InstructionPanel({ sections, effects }: InstructionPanelProps) {
+export function InstructionPanel({ sections, effects, annotationPrompt }: InstructionPanelProps) {
   const [open, setOpen] = useState(false)
   return (
     <section className={`instruction-panel ${open ? 'is-open' : ''}`}>
       <button type="button" className="instruction-toggle" onClick={() => setOpen((value) => !value)} aria-expanded={open}>
-        <span><Icon icon="lucide:notebook-tabs" /> Working instructions</span>
+        <span className="instruction-title"><Icon icon="lucide:notebook-tabs" /><strong>Working instructions</strong><small>{annotationPrompt}</small></span>
         <span className="instruction-hint">{open ? 'Hide' : 'Review before annotating'} <Icon icon={open ? 'lucide:chevron-up' : 'lucide:chevron-down'} /></span>
       </button>
       {open && (
@@ -27,7 +28,6 @@ export function InstructionPanel({ sections, effects }: InstructionPanelProps) {
           ))}
           <section className="effect-glossary" aria-labelledby="effect-glossary-title">
             <div className="effect-glossary-heading">
-              <span className="instruction-index">05</span>
               <div>
                 <h3 id="effect-glossary-title">Supported animation effects</h3>
                 <p>Choose exactly one definition that best matches the sketches.</p>

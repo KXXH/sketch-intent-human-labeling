@@ -291,10 +291,10 @@ export function App() {
       {message && <div className={`global-message ${saveState === 'error' ? 'is-error' : ''}`} role="status"><Icon icon={saveState === 'error' ? 'lucide:triangle-alert' : 'lucide:info'} /><span>{message}</span><button type="button" onClick={() => setMessage(null)} aria-label="Dismiss message"><Icon icon="lucide:x" /></button></div>}
 
       <main className="workspace">
-        <InstructionPanel sections={experimentConfig.instructions} effects={experimentConfig.effects} />
+        <InstructionPanel sections={experimentConfig.instructions} effects={experimentConfig.effects} annotationPrompt={experimentConfig.annotationPrompt} />
         <div className="case-layout">
           <KeyframeStrip images={currentCase.imagePaths.map(assetUrl)} />
-          <AnnotationForm answer={currentAnswer} effects={experimentConfig.effects} annotationPrompt={experimentConfig.annotationPrompt} missing={validationMissing} disabled={readOnly} onChange={updateAnswer} />
+          <AnnotationForm answer={currentAnswer} effects={experimentConfig.effects} missing={validationMissing} disabled={readOnly} onChange={updateAnswer} />
         </div>
 
         <nav className="case-navigation" aria-label="Case navigation">

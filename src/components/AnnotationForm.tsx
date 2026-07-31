@@ -4,7 +4,6 @@ import type { EffectDefinition, EffectId } from '../experiment/types'
 interface AnnotationFormProps {
   answer: CaseAnswer
   effects: EffectDefinition[]
-  annotationPrompt: string
   missing: string[]
   disabled: boolean
   onChange: (patch: Partial<CaseAnswer>) => void
@@ -12,7 +11,7 @@ interface AnnotationFormProps {
 
 function RequiredMark() { return <span className="required-mark">required</span> }
 
-export function AnnotationForm({ answer, effects, annotationPrompt, missing, disabled, onChange }: AnnotationFormProps) {
+export function AnnotationForm({ answer, effects, missing, disabled, onChange }: AnnotationFormProps) {
   const hasError = (field: string) => missing.includes(field)
   const setDuration = (value: DurationAnswer) => onChange({ duration: value })
   const setLoop = (value: LoopAnswer) => onChange({ loop: value })
@@ -30,7 +29,7 @@ export function AnnotationForm({ answer, effects, annotationPrompt, missing, dis
   return (
     <section className="annotation-section" aria-labelledby="annotation-title">
       <div className="section-heading annotation-heading">
-        <div><div className="eyebrow">Your interpretation</div><h2 id="annotation-title">Describe the intended animation</h2><p className="annotation-prompt">{annotationPrompt}</p></div>
+        <div><div className="eyebrow">Your interpretation</div><h2 id="annotation-title">Describe the intended animation</h2></div>
         <p>Answer from the sketches only. Do not infer unstated values.</p>
       </div>
 

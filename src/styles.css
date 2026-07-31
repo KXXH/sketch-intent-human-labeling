@@ -83,6 +83,9 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .instruction-panel { margin-bottom: 16px; border: 1px solid var(--rule); background: var(--paper); }
 .instruction-toggle { width: 100%; min-height: 54px; display: flex; align-items: center; justify-content: space-between; border: 0; background: none; padding: 0 18px; cursor: pointer; }
 .instruction-toggle > span { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+.instruction-toggle .instruction-title { flex: 1; min-width: 0; justify-content: flex-start; text-align: left; }
+.instruction-title strong { flex: 0 0 auto; }
+.instruction-title small { min-width: 0; overflow: hidden; color: var(--muted); font: 400 11px/1.35 "IBM Plex Sans"; text-overflow: ellipsis; white-space: nowrap; }
 .instruction-toggle .instruction-hint { color: var(--muted); font: 400 11px "IBM Plex Mono"; }
 .instruction-grid { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--rule); }
 .instruction-grid article { position: relative; padding: 24px; min-height: 190px; }
@@ -115,7 +118,6 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .case-layout .effect-grid button strong { font-size: 11px; }
 .case-layout .effect-grid button small { font-size: 11px; line-height: 1.3; }
 .section-heading p { margin: 0; color: var(--muted); font: 400 11px "IBM Plex Mono"; }
-.annotation-prompt { max-width: 620px; margin-top: 8px !important; color: var(--ink) !important; font: 500 13px/1.4 "IBM Plex Sans" !important; }
 .filmstrip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--ink); background: #dad6ca; gap: 1px; }
 .frame-card { margin: 0; min-width: 0; background: var(--paper); }
 .frame-card button { position: relative; width: 100%; height: clamp(270px, 27vw, 460px); border: 0; background: #fff; padding: 10px; cursor: zoom-in; overflow: hidden; }
@@ -171,7 +173,7 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 
 @media (max-width: 760px) {
   .start-panel { padding: 90px 24px 40px; }.start-panel h1 { font-size: 50px; }.start-input-row { grid-template-columns: 1fr; }.start-input-row input { border-right: 1px solid var(--ink); border-bottom: 0; }
-  .topbar { padding: 9px 14px; }.topbar .button-quiet, .save-indicator { display: none; }.workspace { width: calc(100% - 20px); margin-top: 10px; }.section-heading { align-items: flex-start; flex-direction: column; }.instruction-grid { grid-template-columns: 1fr; }.instruction-grid > article + article { border-left: 0; border-top: 1px solid var(--rule); }.effect-glossary { padding: 18px; }.effect-glossary-grid { grid-template-columns: 1fr; }.effect-grid { grid-template-columns: 1fr; }.form-column-parameters { grid-template-columns: 1fr; }.form-column-parameters .field-group { grid-column: 1; }.case-navigation { grid-template-columns: 1fr 1fr; }.navigation-progress { grid-column: 1 / -1; grid-row: 1; }.navigation-previous { grid-column: 1; grid-row: 2; }.navigation-skip { grid-column: 2; grid-row: 2; }.navigation-next { grid-column: 1 / -1; grid-row: 3; }.case-navigation .button { padding-inline: 8px; font-size: 12px; }
+  .topbar { padding: 9px 14px; }.topbar .button-quiet, .save-indicator { display: none; }.workspace { width: calc(100% - 20px); margin-top: 10px; }.instruction-title small { display: none; }.section-heading { align-items: flex-start; flex-direction: column; }.instruction-grid { grid-template-columns: 1fr; }.instruction-grid > article + article { border-left: 0; border-top: 1px solid var(--rule); }.effect-glossary { padding: 18px; }.effect-glossary-grid { grid-template-columns: 1fr; }.effect-grid { grid-template-columns: 1fr; }.form-column-parameters { grid-template-columns: 1fr; }.form-column-parameters .field-group { grid-column: 1; }.case-navigation { grid-template-columns: 1fr 1fr; }.navigation-progress { grid-column: 1 / -1; grid-row: 1; }.navigation-previous { grid-column: 1; grid-row: 2; }.navigation-skip { grid-column: 2; grid-row: 2; }.navigation-next { grid-column: 1 / -1; grid-row: 3; }.case-navigation .button { padding-inline: 8px; font-size: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
