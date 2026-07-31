@@ -180,12 +180,16 @@ export function App() {
       setMessage('Complete every required field or use “Skip for now”.')
       return
     }
-    const nextId = session.caseOrder[currentIndex + 1]
     mutate((current) => {
       const timed = addElapsedTime(current)
       const now = new Date().toISOString()
       const answer = timed.answers[timed.currentCaseId]
       const answers = { ...timed.answers, [timed.currentCaseId]: { ...answer, status: 'completed' as const, lastUpdatedAt: now } }
+      const currentOrderIndex = timed.caseOrder.indexOf(timed.currentCaseId)
+      const nextId = timed.caseOrder
+        .slice(currentOrderIndex + 1)
+        .concat(timed.caseOrder.slice(0, currentOrderIndex))
+        .find((id) => answers[id]?.status !== 'completed')
       if (!nextId) return { ...timed, answers }
       return { ...timed, answers: answers[nextId] ? answers : { ...answers, [nextId]: createEmptyAnswer(now) }, currentCaseId: nextId }
     })
@@ -197,11 +201,15 @@ export function App() {
 
   const skipCurrent = () => {
     if (!session || !currentAnswer) return
-    const nextId = session.caseOrder[currentIndex + 1] ?? session.caseOrder.find((id) => !session.answers[id]) ?? session.currentCaseId
     mutate((current) => {
       const timed = addElapsedTime(current)
       const now = new Date().toISOString()
       const answers = { ...timed.answers, [timed.currentCaseId]: { ...timed.answers[timed.currentCaseId], status: 'skipped' as const, lastUpdatedAt: now } }
+      const currentOrderIndex = timed.caseOrder.indexOf(timed.currentCaseId)
+      const nextId = timed.caseOrder
+        .slice(currentOrderIndex + 1)
+        .concat(timed.caseOrder.slice(0, currentOrderIndex))
+        .find((id) => answers[id]?.status !== 'completed') ?? timed.currentCaseId
       return { ...timed, answers: answers[nextId] ? answers : { ...answers, [nextId]: createEmptyAnswer(now) }, currentCaseId: nextId }
     })
     setValidationMissing([])
@@ -253,9 +261,9 @@ export function App() {
 
       <main className="workspace">
         <InstructionPanel sections={experimentConfig.instructions} effects={experimentConfig.effects} />
-        <ProgressGrid caseOrder={session.caseOrder} answers={session.answers} currentCaseId={session.currentCaseId} disabled={readOnly} onSelect={navigate} />
+        <ProgressGrid caseOrder={session.caseOrder} answers={session.answers} currentCaseId={session.currentCaseId} />
 
-        <div className="case-rule"><span>CASE {String(currentIndex + 1).padStart(2, '0')}</span><i /><strong>{complete}/{total} complete</strong>{skipped > 0 && <em>{skipped} to revisit</em>}</div>
+        <div className="case-rule"><i /><strong>{complete}/{total} complete</strong>{skipped > 0 && <em>{skipped} to revisit</em>}</div>
         <div className="case-layout">
           <KeyframeStrip images={currentCase.imagePaths.map(assetUrl)} />
           <AnnotationForm answer={currentAnswer} effects={experimentConfig.effects} missing={validationMissing} disabled={readOnly} onChange={updateAnswer} />
@@ -264,7 +272,7 @@ export function App() {
         <nav className="case-navigation" aria-label="Case navigation">
           <button className="button button-quiet" type="button" disabled={readOnly || currentIndex === 0} onClick={() => navigate(session.caseOrder[currentIndex - 1])}><Icon icon="lucide:arrow-left" /> Previous</button>
           <button className="button button-skip" type="button" disabled={readOnly} onClick={skipCurrent}><Icon icon="lucide:bookmark" /> Skip for now</button>
-          <button className="button button-primary" type="button" disabled={readOnly} onClick={completeCurrent}>{currentIndex === total - 1 ? 'Complete case' : 'Save & next'} <Icon icon="lucide:arrow-right" /></button>
+          <button className="button button-primary" type="button" disabled={readOnly} onClick={completeCurrent}>{currentIndex === total - 1 && complete === total - 1 && skipped === 0 ? 'Complete case' : 'Save & next'} <Icon icon="lucide:arrow-right" /></button>
         </nav>
       </main>
       <footer><span>No network connection · no analytics · local browser storage</span><span>Dataset {experimentConfig.datasetId} / {experimentConfig.datasetVersion}</span></footer>

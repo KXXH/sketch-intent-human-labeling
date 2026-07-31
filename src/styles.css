@@ -127,9 +127,8 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .legend-active { background: var(--teal-soft); border-color: var(--teal) !important; }.legend-skipped { background: var(--amber-soft); border-color: var(--amber) !important; }.legend-complete { background: var(--teal) !important; border-color: var(--teal) !important; }
 .progress-ledger { padding: 6px 12px 8px; overflow-x: auto; }
 .progress-grid { display: grid; grid-template-columns: repeat(80, minmax(14px, 1fr)); min-width: 1120px; border: 1px solid #bcb9af; background: #d8d5cb; gap: 1px; }
-.progress-cell { position: relative; min-width: 0; height: 18px; border: 0; background: #f5f3ec; color: #817f77; cursor: pointer; font: 400 clamp(6px,.42vw,8px) "IBM Plex Mono"; transition: color .14s, background .14s; }
+.progress-cell { position: relative; min-width: 0; height: 18px; border: 0; background: #f5f3ec; color: #817f77; transition: background .14s; }
 .progress-cell:nth-child(10n + 1):not(:first-child) { box-shadow: -2px 0 0 var(--ink); }
-.progress-cell:hover:not(:disabled) { color: var(--ink); background: #fff; z-index: 2; }
 .progress-cell.status-in_progress { background: repeating-linear-gradient(135deg, var(--teal-soft) 0 4px, #d7e7e1 4px 6px); color: var(--teal-dark); }
 .progress-cell.status-skipped { color: #7a430f; border-color: #d39857; background: repeating-linear-gradient(135deg, #f7e8d4 0 5px, #efd5b2 5px 7px); }
 .progress-cell.status-completed { color: #fff; background: var(--teal); border-color: var(--teal-dark); }

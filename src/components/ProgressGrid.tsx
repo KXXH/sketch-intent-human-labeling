@@ -4,11 +4,9 @@ interface ProgressGridProps {
   caseOrder: string[]
   answers: Record<string, CaseAnswer>
   currentCaseId: string
-  disabled: boolean
-  onSelect: (caseId: string) => void
 }
 
-export function ProgressGrid({ caseOrder, answers, currentCaseId, disabled, onSelect }: ProgressGridProps) {
+export function ProgressGrid({ caseOrder, answers, currentCaseId }: ProgressGridProps) {
   const completed = Object.values(answers).filter((answer) => answer.status === 'completed').length
 
   return (
@@ -27,23 +25,20 @@ export function ProgressGrid({ caseOrder, answers, currentCaseId, disabled, onSe
         </div>
       </div>
       <div className="progress-ledger">
-        <div className="progress-grid">
+        <div className="progress-grid" role="list" aria-label="Annotation progress by case order">
           {caseOrder.map((caseId, index) => {
             const status = answers[caseId]?.status ?? 'unseen'
             const current = caseId === currentCaseId
             return (
-              <button
+              <span
                 key={caseId}
-                type="button"
-                disabled={disabled}
                 className={`progress-cell status-${status} ${current ? 'is-current' : ''}`}
+                role="listitem"
                 aria-current={current ? 'step' : undefined}
-                aria-label={`Case ${index + 1}: ${status.replace('_', ' ')}`}
-                title={`${index + 1}. ${caseId} · ${status.replace('_', ' ')}`}
-                onClick={() => onSelect(caseId)}
+                aria-label={`Progress ${index + 1}: ${status.replace('_', ' ')}`}
               >
-                <span>{String(index + 1).padStart(2, '0')}</span>
-              </button>
+                <span className="sr-only">{String(index + 1).padStart(2, '0')}</span>
+              </span>
             )
           })}
         </div>
