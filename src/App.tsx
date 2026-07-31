@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnnotationForm } from './components/AnnotationForm'
 import { InstructionPanel } from './components/InstructionPanel'
 import { KeyframeStrip } from './components/KeyframeStrip'
-import { ProgressGrid } from './components/ProgressGrid'
 import { StartScreen } from './components/StartScreen'
 import { canFinalize, completedCount, createEmptyAnswer, createSession, skippedCount, validateAnswer } from './domain/session'
 import type { AnnotationSessionData, CaseAnswer } from './domain/types'
@@ -33,7 +32,7 @@ export function App() {
   const sessionRef = useRef<AnnotationSessionData | null>(null)
   const activeStartedAt = useRef(Date.now())
   const importRef = useRef<HTMLInputElement>(null)
-  const { readOnly, ownsLease, takeOver } = useSessionLease(experimentConfig, session?.annotatorId ?? null)
+  const { readOnly, leaseReady, ownsLease, takeOver } = useSessionLease(experimentConfig, session?.annotatorId ?? null)
 
   const persistNow = useCallback((value: AnnotationSessionData) => {
     if (!ownsLease()) {
@@ -56,10 +55,10 @@ export function App() {
   useEffect(() => { sessionRef.current = session }, [session])
 
   useEffect(() => {
-    if (!session || readOnly) return
+    if (!session || readOnly || !leaseReady) return
     const timeout = window.setTimeout(() => persistNow(session), 180)
     return () => window.clearTimeout(timeout)
-  }, [persistNow, readOnly, session])
+  }, [leaseReady, persistNow, readOnly, session])
 
   const addElapsedTime = useCallback((value: AnnotationSessionData): AnnotationSessionData => {
     const elapsed = document.visibilityState === 'visible' ? Math.max(0, Date.now() - activeStartedAt.current) : 0
@@ -197,6 +196,7 @@ export function App() {
       if (field === 'duration') return patch.duration === undefined || patch.duration === null || (patch.duration.kind === 'text' && !patch.duration.text.trim())
       if (field === 'loop') return patch.loop === undefined || patch.loop === null || (patch.loop.kind === 'text' && !patch.loop.text.trim())
       if (field === 'confidence') return patch.confidence === undefined || patch.confidence === null
+      if (field === 'explanation') return patch.explanation === undefined || !patch.explanation.trim()
       return true
     }))
   }
@@ -276,8 +276,6 @@ export function App() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <div className="brand-lockup"><span className="brand-index">HI<br />01</span><div><strong>Sketch Intent</strong><small>Human annotation instrument</small></div></div>
-        <div className="session-meta"><span>DATASET <strong>{session.datasetVersion}</strong></span><span>ANNOTATOR <strong>{session.annotatorId}</strong></span></div>
         <div className="topbar-actions">
           <span className={`save-indicator save-${saveState}`}><i />{saveState === 'error' ? 'Save failed' : saveState === 'saving' ? 'Saving…' : 'Saved locally'}</span>
           <button type="button" className="icon-button" title="Import backup" disabled={readOnly} onClick={() => importRef.current?.click()}><Icon icon="lucide:upload" /></button>
@@ -294,21 +292,19 @@ export function App() {
 
       <main className="workspace">
         <InstructionPanel sections={experimentConfig.instructions} effects={experimentConfig.effects} />
-        <ProgressGrid caseOrder={session.caseOrder} answers={session.answers} currentCaseId={session.currentCaseId} />
-
-        <div className="case-rule"><i /><strong>{complete}/{total} complete</strong>{skipped > 0 && <em>{skipped} to revisit</em>}</div>
         <div className="case-layout">
           <KeyframeStrip images={currentCase.imagePaths.map(assetUrl)} />
-          <AnnotationForm answer={currentAnswer} effects={experimentConfig.effects} missing={validationMissing} disabled={readOnly} onChange={updateAnswer} />
+          <AnnotationForm answer={currentAnswer} effects={experimentConfig.effects} annotationPrompt={experimentConfig.annotationPrompt} missing={validationMissing} disabled={readOnly} onChange={updateAnswer} />
         </div>
 
         <nav className="case-navigation" aria-label="Case navigation">
-          <button className="button button-quiet" type="button" disabled={readOnly || currentIndex === 0} onClick={() => navigate(session.caseOrder[currentIndex - 1])}><Icon icon="lucide:arrow-left" /> Previous</button>
-          <button className="button button-skip" type="button" disabled={readOnly} onClick={skipCurrent}><Icon icon="lucide:bookmark" /> Skip for now</button>
-          <button className="button button-primary" type="button" disabled={readOnly} onClick={completeCurrent}>{currentIndex === total - 1 && complete === total - 1 && skipped === 0 ? 'Complete case' : 'Save & next'} <Icon icon="lucide:arrow-right" /></button>
+          <button className="button button-quiet navigation-previous" type="button" disabled={readOnly || currentIndex === 0} onClick={() => navigate(session.caseOrder[currentIndex - 1])}><Icon icon="lucide:arrow-left" /> Previous</button>
+          <button className="button button-skip navigation-skip" type="button" disabled={readOnly} onClick={skipCurrent}><Icon icon="lucide:bookmark" /> Skip for now</button>
+          <div className="navigation-progress" aria-label={`${complete} of ${total} cases complete`}><strong>{complete}/{total}</strong><span>{skipped > 0 ? `${skipped} to revisit` : 'cases complete'}</span></div>
+          <button className="button button-primary navigation-next" type="button" disabled={readOnly} onClick={completeCurrent}>{currentIndex === total - 1 && complete === total - 1 && skipped === 0 ? 'Complete case' : 'Save & next'} <Icon icon="lucide:arrow-right" /></button>
         </nav>
       </main>
-      <footer><span>No network connection · no analytics · local browser storage</span><span>Dataset {experimentConfig.datasetId} / {experimentConfig.datasetVersion}</span></footer>
+      <footer><span>No network connection · no analytics · local browser storage</span></footer>
     </div>
   )
 }

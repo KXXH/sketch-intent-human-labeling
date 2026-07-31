@@ -6,26 +6,28 @@ export const experimentConfig = {
   datasetId: 'sketch-intent-40-pairs',
   datasetVersion: '2026-07-30.1',
   title: 'Sketch Intent Annotation',
+  annotationPrompt: 'Share your understanding of the intended animation from the sketches atop of the chart.',
   instructions: [
     {
-      title: 'Overall',
-      body: 'Share your understanding of the intended animation from the sketches atop of the chart.',
+      title: 'Read the sequence',
+      body: 'The first frame is the original chart without sketches. The last frame contains the complete sketch. Intermediate frames show how the sketch was built. Consider every frame and every sketch mark when interpreting the intended animation.',
     },
     {
-      title: 'Target',
+      title: 'Identify the target',
       body: 'Use natural language to describe the target chart element(s) intended to animate.',
       points: [
-        'Targets must be visual marks such as bars, lines, points, or pie slices.',
+        'Target visual marks: bars, lines, points, or pie slices.',
         'Do not select axes, titles, labels, grid lines, or legends.',
+        'Describe only the intended target, not elements that explain or label the sketch.',
       ],
     },
     {
-      title: 'Effect and timing',
-      body: 'Choose one effect that aligns with your understanding of the sketches. Describe duration (how long the animation lasts) and looping (how many times the animation repeats) when the sketches explicitly communicate them. Otherwise choose “Not shown in the sketches” rather than guessing.',
+      title: 'Interpret the animation',
+      body: 'Choose one supported effect. Describe duration and looping in your own words only when the sketches explicitly communicate them. Otherwise choose “Not shown in the sketches” rather than guessing.',
     },
     {
-      title: 'Confidence',
-      body: 'Report confidence in your interpretation. Lower the score when the sketches are ambiguous. Use the explanation field to record ambiguity or reasoning.',
+      title: 'Report confidence',
+      body: 'Use the 1–7 scale to report confidence in your complete interpretation. Lower the score when the sketches are ambiguous. Use the explanation to record ambiguity or reasoning.',
     },
   ],
   effects: [

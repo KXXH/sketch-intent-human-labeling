@@ -4,6 +4,7 @@ import type { EffectDefinition, EffectId } from '../experiment/types'
 interface AnnotationFormProps {
   answer: CaseAnswer
   effects: EffectDefinition[]
+  annotationPrompt: string
   missing: string[]
   disabled: boolean
   onChange: (patch: Partial<CaseAnswer>) => void
@@ -11,7 +12,7 @@ interface AnnotationFormProps {
 
 function RequiredMark() { return <span className="required-mark">required</span> }
 
-export function AnnotationForm({ answer, effects, missing, disabled, onChange }: AnnotationFormProps) {
+export function AnnotationForm({ answer, effects, annotationPrompt, missing, disabled, onChange }: AnnotationFormProps) {
   const hasError = (field: string) => missing.includes(field)
   const setDuration = (value: DurationAnswer) => onChange({ duration: value })
   const setLoop = (value: LoopAnswer) => onChange({ loop: value })
@@ -29,7 +30,7 @@ export function AnnotationForm({ answer, effects, missing, disabled, onChange }:
   return (
     <section className="annotation-section" aria-labelledby="annotation-title">
       <div className="section-heading annotation-heading">
-        <div><div className="eyebrow">Your interpretation</div><h2 id="annotation-title">Describe the intended animation</h2></div>
+        <div><div className="eyebrow">Your interpretation</div><h2 id="annotation-title">Describe the intended animation</h2><p className="annotation-prompt">{annotationPrompt}</p></div>
         <p>Answer from the sketches only. Do not infer unstated values.</p>
       </div>
 
@@ -39,13 +40,12 @@ export function AnnotationForm({ answer, effects, missing, disabled, onChange }:
             <label htmlFor="target-text"><span>01</span> Target <RequiredMark /></label>
             <textarea
               id="target-text"
-              rows={3}
+              rows={2}
               disabled={disabled}
               value={answer.targetText}
               onChange={(event) => onChange({ targetText: event.target.value })}
               placeholder="Describe the target visual mark(s) in natural language…"
             />
-            <p className="field-note">Visual marks only — not axes, titles, labels, grid lines, or legends.</p>
           </div>
 
           <div className={`field-group ${hasError('effect') ? 'has-error' : ''}`}>
@@ -104,8 +104,8 @@ export function AnnotationForm({ answer, effects, missing, disabled, onChange }:
             </div>
           </div>
 
-          <div className="field-group">
-            <label htmlFor="explanation"><span>06</span> Explanation <em>optional</em></label>
+          <div className={`field-group ${hasError('explanation') ? 'has-error' : ''}`}>
+            <label htmlFor="explanation"><span>06</span> Explanation <RequiredMark /></label>
             <textarea id="explanation" rows={4} disabled={disabled} value={answer.explanation} onChange={(event) => onChange({ explanation: event.target.value })} placeholder="Record ambiguity or reasoning that may help later analysis…" />
           </div>
         </div>

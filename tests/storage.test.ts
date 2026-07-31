@@ -18,6 +18,7 @@ const config: ExperimentConfig = {
   datasetId: 'test-dataset',
   datasetVersion: '1',
   title: 'Test',
+  annotationPrompt: 'Describe the intended animation.',
   instructions: [],
   effects: [],
   cases: [

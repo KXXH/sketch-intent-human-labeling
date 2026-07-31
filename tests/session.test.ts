@@ -5,7 +5,7 @@ import type { AnnotationSessionData } from '../src/domain/types'
 describe('answer completion', () => {
   it('requires target, effect, duration, loop, and confidence', () => {
     const answer = createEmptyAnswer('2026-01-01T00:00:00.000Z')
-    expect(validateAnswer(answer).missing).toEqual(['target', 'effect', 'duration', 'loop', 'confidence'])
+    expect(validateAnswer(answer).missing).toEqual(['target', 'effect', 'duration', 'loop', 'confidence', 'explanation'])
     const complete = {
       ...answer,
       targetText: 'the MSFT line',
@@ -13,6 +13,7 @@ describe('answer completion', () => {
       duration: { kind: 'not_shown' as const },
       loop: { kind: 'text' as const, text: 'repeats twice' },
       confidence: 5 as const,
+      explanation: 'The sketches clearly identify the target.',
       status: 'completed' as const,
     }
     expect(validateAnswer(complete).valid).toBe(true)
@@ -27,7 +28,7 @@ describe('answer completion', () => {
       loop: { kind: 'text' as const, text: 'continuously' },
       confidence: 5 as const,
     }
-    expect(validateAnswer(answer).missing).toEqual(['duration'])
+    expect(validateAnswer(answer).missing).toEqual(['duration', 'explanation'])
   })
 
   it('blocks finalization while any answer is skipped', () => {

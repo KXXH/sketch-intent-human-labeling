@@ -24,6 +24,7 @@ export function validateAnswer(answer: CaseAnswer | undefined): AnswerValidation
   if (!answer?.duration || (answer.duration.kind === 'text' && !answer.duration.text.trim())) missing.push('duration')
   if (!answer?.loop || (answer.loop.kind === 'text' && !answer.loop.text.trim())) missing.push('loop')
   if (!answer?.confidence) missing.push('confidence')
+  if (!answer?.explanation.trim()) missing.push('explanation')
   return { valid: missing.length === 0, missing }
 }
 

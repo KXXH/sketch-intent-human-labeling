@@ -23,10 +23,8 @@ export function KeyframeStrip({ images }: KeyframeStripProps) {
     <section className="keyframe-section" aria-labelledby="keyframe-title">
       <div className="section-heading">
         <div>
-          <div className="eyebrow">Visual evidence</div>
           <h2 id="keyframe-title">Sketch sequence</h2>
         </div>
-        <p>Frame 1 is clean. Frame 4 is complete.</p>
       </div>
       <div className="filmstrip">
         {images.map((source, index) => (

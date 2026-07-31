@@ -18,6 +18,7 @@ function readLease(key: string): LeaseRecord | null {
 export function useSessionLease(config: ExperimentConfig, annotatorId: string | null) {
   const tabId = useRef(crypto.randomUUID())
   const [readOnly, setReadOnly] = useState(false)
+  const [leaseReady, setLeaseReady] = useState(false)
   const channelRef = useRef<BroadcastChannel | null>(null)
 
   const claim = useCallback(async (force = false): Promise<boolean> => {
@@ -27,6 +28,7 @@ export function useSessionLease(config: ExperimentConfig, annotatorId: string | 
     const writeLease = () => {
       const existing = readLease(key)
       if (!force && existing && existing.tabId !== tabId.current && existing.expiresAt > Date.now()) {
+        setLeaseReady(true)
         setReadOnly(true)
         return false
       }
@@ -34,10 +36,12 @@ export function useSessionLease(config: ExperimentConfig, annotatorId: string | 
         localStorage.setItem(key, JSON.stringify({ tabId: tabId.current, expiresAt: Date.now() + LEASE_MS }))
         const verified = readLease(key)
         const owner = verified?.tabId === tabId.current && verified.expiresAt > Date.now()
+        setLeaseReady(true)
         setReadOnly(!owner)
         if (owner) channelRef.current?.postMessage({ type: 'claimed', tabId: tabId.current })
         return owner
       } catch {
+        setLeaseReady(true)
         setReadOnly(true)
         return false
       }
@@ -60,7 +64,11 @@ export function useSessionLease(config: ExperimentConfig, annotatorId: string | 
   }, [annotatorId, config])
 
   useEffect(() => {
-    if (!annotatorId) return
+    if (!annotatorId) {
+      setLeaseReady(false)
+      return
+    }
+    setLeaseReady(false)
     const key = leaseKey(config, annotatorId)
     channelRef.current = 'BroadcastChannel' in window ? new BroadcastChannel(key) : null
     channelRef.current?.addEventListener('message', (event) => {
@@ -85,5 +93,5 @@ export function useSessionLease(config: ExperimentConfig, annotatorId: string | 
     }
   }, [annotatorId, claim, config])
 
-  return { readOnly, ownsLease, takeOver: () => claim(true) }
+  return { readOnly, leaseReady, ownsLease, takeOver: () => claim(true) }
 }

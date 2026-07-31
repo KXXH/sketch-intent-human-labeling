@@ -36,6 +36,7 @@ export interface ExperimentConfig {
   datasetId: string
   datasetVersion: string
   title: string
+  annotationPrompt: string
   instructions: InstructionSection[]
   effects: EffectDefinition[]
   cases: ExperimentCase[]
