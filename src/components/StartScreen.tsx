@@ -34,7 +34,7 @@ export function StartScreen({ error, onStart, onImport }: StartScreenProps) {
               autoComplete="off"
               spellCheck={false}
               maxLength={60}
-              placeholder="e.g. annotator-07"
+              placeholder="Your Name"
               autoFocus
             />
             <button className="button button-primary" type="submit" disabled={!annotatorId.trim()}>
