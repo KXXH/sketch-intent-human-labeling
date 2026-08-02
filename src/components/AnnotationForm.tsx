@@ -29,7 +29,9 @@ export function AnnotationForm({ answer, effects, missing, disabled, onChange }:
   return (
     <section className="annotation-section" aria-labelledby="annotation-title">
       <div className="section-heading annotation-heading">
-        <div><div className="eyebrow">Your interpretation</div><h2 id="annotation-title">Describe the intended animation</h2></div>
+        <div>
+          {/* <div className="eyebrow">Your interpretation</div> */}
+          <h2 id="annotation-title">Describe the intended animation</h2></div>
         <p>Answer from the sketches only. Do not infer unstated values.</p>
       </div>
 
@@ -61,9 +63,9 @@ export function AnnotationForm({ answer, effects, missing, disabled, onChange }:
                   title={effect.definition}
                   onClick={() => onChange({ effect: effect.id as EffectId })}
                 >
+                  <i aria-hidden="true" />
                   <strong>{effect.label}</strong>
                   <small>{effect.definition}</small>
-                  <i aria-hidden="true" />
                 </button>
               ))}
             </div>
@@ -85,7 +87,7 @@ export function AnnotationForm({ answer, effects, missing, disabled, onChange }:
 
           <div className={`field-group parameter-field ${hasError('loop') ? 'has-error' : ''}`}>
             <label><span>04</span> Loop <RequiredMark /></label>
-            <p className="field-description">How many times the animation repeats.</p>
+            <p className="field-description">The times the animation repeats.</p>
             <div className="segmented-choice">
               <button type="button" disabled={disabled} className={!answer.loop || answer.loop.kind === 'text' || answer.loop.kind === 'value' ? 'is-selected' : ''} onClick={() => setLoop({ kind: 'text', text: loopText })}>Describe</button>
               <button type="button" disabled={disabled} className={answer.loop?.kind === 'not_shown' ? 'is-selected' : ''} onClick={() => setLoop({ kind: 'not_shown' })}>Not shown</button>

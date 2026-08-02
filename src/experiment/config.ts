@@ -14,11 +14,11 @@ export const experimentConfig = {
     },
     {
       title: 'Identify the target',
-      body: 'Use natural language to describe the target chart element(s) intended to animate.',
+      body: 'Use natural language to describe the target chart element(s) intended to animate. The target may be a single visual mark or a group of marks, i.e., bars, lines, points, or pie slices. If the sketches are ambiguous, describe the most likely target.',
       points: [
-        'Target visual marks: bars, lines, points, or pie slices.',
-        'Do not select axes, titles, labels, grid lines, or legends.',
-        'Describe only the intended target, not elements that explain or label the sketch.',
+        // 'Target visual marks: bars, lines, points, or pie slices.',
+        // 'Do not select axes, titles, labels, grid lines, or legends.',
+        // 'Describe only the intended target, not elements that explain or label the sketch.',
       ],
     },
     {
