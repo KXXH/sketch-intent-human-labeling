@@ -1,5 +1,6 @@
 import { Icon } from '@iconify/react'
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 interface KeyframeStripProps {
   images: string[]
@@ -38,13 +39,16 @@ export function KeyframeStrip({ images }: KeyframeStripProps) {
         ))}
       </div>
       {expanded !== null && (
-        <div className="lightbox" role="dialog" aria-modal="true" aria-label={`Enlarged frame ${expanded + 1}`} onClick={() => setExpanded(null)}>
-          <button className="lightbox-close" type="button" onClick={() => setExpanded(null)} aria-label="Close image viewer"><Icon icon="lucide:x" /></button>
-          <button className="lightbox-arrow left" type="button" onClick={(event) => { event.stopPropagation(); setExpanded((expanded + images.length - 1) % images.length) }} aria-label="Previous frame"><Icon icon="lucide:arrow-left" /></button>
-          <img src={images[expanded]} alt={`Enlarged keyframe ${expanded + 1}`} onClick={(event) => event.stopPropagation()} />
-          <button className="lightbox-arrow right" type="button" onClick={(event) => { event.stopPropagation(); setExpanded((expanded + 1) % images.length) }} aria-label="Next frame"><Icon icon="lucide:arrow-right" /></button>
-          <div className="lightbox-label">FRAME {String(expanded + 1).padStart(2, '0')} / 04</div>
-        </div>
+        createPortal(
+          <div className="lightbox" role="dialog" aria-modal="true" aria-label={`Enlarged frame ${expanded + 1}`} onClick={() => setExpanded(null)}>
+            <button className="lightbox-close" type="button" onClick={() => setExpanded(null)} aria-label="Close image viewer"><Icon icon="lucide:x" /></button>
+            <button className="lightbox-arrow left" type="button" onClick={(event) => { event.stopPropagation(); setExpanded((expanded + images.length - 1) % images.length) }} aria-label="Previous frame"><Icon icon="lucide:arrow-left" /></button>
+            <img src={images[expanded]} alt={`Enlarged keyframe ${expanded + 1}`} onClick={(event) => event.stopPropagation()} />
+            <button className="lightbox-arrow right" type="button" onClick={(event) => { event.stopPropagation(); setExpanded((expanded + 1) % images.length) }} aria-label="Next frame"><Icon icon="lucide:arrow-right" /></button>
+            <div className="lightbox-label">FRAME {String(expanded + 1).padStart(2, '0')} / 04</div>
+          </div>,
+          document.body,
+        )
       )}
     </section>
   )
