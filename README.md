@@ -1,4 +1,4 @@
-# Sketch Intent Human Annotation
+# Sketch Intent Annotation
 
 Independent static WebUI for collecting human interpretations of sketch-defined chart animations.
 

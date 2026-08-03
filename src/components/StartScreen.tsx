@@ -20,7 +20,7 @@ export function StartScreen({ error, onStart, onImport }: StartScreenProps) {
   return (
     <main className="start-shell">
       <section className="start-panel" aria-labelledby="start-title">
-        <h1 id="start-title">Read the sketch.<br />Name the animation.</h1>
+        <h1 id="start-title">Read the sketch,<br />NAME the animation.</h1>
 
         {error && <div className="alert alert-error" role="alert"><Icon icon="lucide:triangle-alert" />{error}</div>}
 

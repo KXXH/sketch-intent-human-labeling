@@ -23,11 +23,11 @@ export const experimentConfig = {
     },
     {
       title: 'Interpret the animation',
-      body: 'Choose one supported effect. Describe duration and looping in your own words only when the sketches explicitly communicate them. Otherwise choose “Not shown in the sketches” rather than guessing.',
+      body: 'Choose one supported effect. Describe duration and loop only when the sketches explicitly communicate them. Otherwise choose “Not shown in the sketches” rather than guessing.',
     },
     {
       title: 'Report confidence',
-      body: 'Use the 1–7 scale to report confidence in your complete interpretation. Lower the score when the sketches are ambiguous. Use the explanation to record ambiguity or reasoning.',
+      body: 'Use the 1–7 scale to report confidence in your interpretation. Lower the score when the sketches are ambiguous. Use the explanation to record ambiguity or reasoning.',
     },
   ],
   effects: [

@@ -31,7 +31,7 @@ export function AnnotationForm({ answer, effects, missing, disabled, onChange }:
       <div className="section-heading annotation-heading">
         <div>
           {/* <div className="eyebrow">Your interpretation</div> */}
-          <h2 id="annotation-title">Describe the intended animation</h2></div>
+          <h2 id="annotation-title">Describe the animation</h2></div>
         <p>Answer from the sketches only. Do not infer unstated values.</p>
       </div>
 
@@ -51,6 +51,7 @@ export function AnnotationForm({ answer, effects, missing, disabled, onChange }:
 
           <div className={`field-group ${hasError('effect') ? 'has-error' : ''}`}>
             <label><span>02</span> Effect <RequiredMark /></label>
+            <p className="field-description">Choose exactly one effect that best matches the sketches.</p>
             <div className="effect-grid" role="radiogroup" aria-label="Animation effect">
               {effects.map((effect) => (
                 <button
@@ -81,7 +82,7 @@ export function AnnotationForm({ answer, effects, missing, disabled, onChange }:
               <button type="button" disabled={disabled} className={answer.duration?.kind === 'not_shown' ? 'is-selected' : ''} onClick={() => setDuration({ kind: 'not_shown' })}>Not shown</button>
             </div>
             {(!answer.duration || answer.duration.kind === 'text' || answer.duration.kind === 'value') && (
-              <div className="text-input-with-suffix"><input className="text-input" type="text" disabled={disabled} value={durationText.replace(/\s*seconds?\s*$/i, '')} onChange={(event) => setDuration({ kind: 'text', text: event.target.value })} placeholder="e.g. about 1.5" /><span>seconds</span></div>
+              <div className="text-input-with-suffix"><input className="text-input" type="text" disabled={disabled} value={durationText.replace(/\s*seconds?\s*$/i, '')} onChange={(event) => setDuration({ kind: 'text', text: event.target.value })} placeholder="e.g. about 1.5" /><span>second(s)</span></div>
             )}
           </div>
 
@@ -93,7 +94,7 @@ export function AnnotationForm({ answer, effects, missing, disabled, onChange }:
               <button type="button" disabled={disabled} className={answer.loop?.kind === 'not_shown' ? 'is-selected' : ''} onClick={() => setLoop({ kind: 'not_shown' })}>Not shown</button>
             </div>
             {(!answer.loop || answer.loop.kind === 'text' || answer.loop.kind === 'value') && (
-              <div className="text-input-with-suffix"><input className="text-input" type="text" disabled={disabled} value={loopText.replace(/\s+(?:time|times)\s*$/i, '')} onChange={(event) => setLoop({ kind: 'text', text: event.target.value })} placeholder="e.g. 3" /><span>times</span></div>
+              <div className="text-input-with-suffix"><input className="text-input" type="text" disabled={disabled} value={loopText.replace(/\s+(?:time|times)\s*$/i, '')} onChange={(event) => setLoop({ kind: 'text', text: event.target.value })} placeholder="e.g. 3" /><span>time(s)</span></div>
             )}
           </div>
 
@@ -108,8 +109,9 @@ export function AnnotationForm({ answer, effects, missing, disabled, onChange }:
           </div>
 
           <div className={`field-group ${hasError('explanation') ? 'has-error' : ''}`}>
-            <label htmlFor="explanation"><span>06</span> Explanation <RequiredMark /></label>
-            <textarea id="explanation" rows={4} disabled={disabled} value={answer.explanation} onChange={(event) => onChange({ explanation: event.target.value })} placeholder="Record ambiguity or reasoning that may help later analysis…" />
+            <label htmlFor="explanation"><span>06</span> Explanation </label>
+            {/* <label htmlFor="explanation"><span>06</span> Explanation <RequiredMark /></label> */}
+            <textarea id="explanation" rows={3} disabled={disabled} value={answer.explanation} onChange={(event) => onChange({ explanation: event.target.value })} placeholder="Record ambiguity or reasoning that may help later analysis......" />
           </div>
         </div>
       </div>

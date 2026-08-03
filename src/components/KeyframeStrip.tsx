@@ -1,5 +1,5 @@
 import { Icon } from '@iconify/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 interface KeyframeStripProps {
   images: string[]
@@ -7,6 +7,8 @@ interface KeyframeStripProps {
 
 export function KeyframeStrip({ images }: KeyframeStripProps) {
   const [expanded, setExpanded] = useState<number | null>(null)
+  const [viewerBounds, setViewerBounds] = useState<{ left: number; top: number; width: number } | null>(null)
+  const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -19,8 +21,32 @@ export function KeyframeStrip({ images }: KeyframeStripProps) {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [expanded, images.length])
 
+  useLayoutEffect(() => {
+    if (expanded === null) return
+
+    const updateViewerBounds = () => {
+      const bounds = sectionRef.current?.getBoundingClientRect()
+      if (!bounds) return
+      setViewerBounds((current) => current?.left === bounds.left && current.top === bounds.top && current.width === bounds.width
+        ? current
+        : { left: bounds.left, top: bounds.top, width: bounds.width })
+    }
+
+    updateViewerBounds()
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(updateViewerBounds)
+    if (sectionRef.current) observer?.observe(sectionRef.current)
+    window.addEventListener('resize', updateViewerBounds)
+    window.addEventListener('scroll', updateViewerBounds, true)
+
+    return () => {
+      observer?.disconnect()
+      window.removeEventListener('resize', updateViewerBounds)
+      window.removeEventListener('scroll', updateViewerBounds, true)
+    }
+  }, [expanded])
+
   return (
-    <section className="keyframe-section" aria-labelledby="keyframe-title">
+    <section ref={sectionRef} className="keyframe-section" aria-labelledby="keyframe-title">
       <div className="section-heading">
         <div>
           <h2 id="keyframe-title">Sketch sequence</h2>
@@ -37,8 +63,8 @@ export function KeyframeStrip({ images }: KeyframeStripProps) {
           </figure>
         ))}
       </div>
-      {expanded !== null && (
-        <div className="lightbox" role="dialog" aria-modal="true" aria-label={`Enlarged frame ${expanded + 1}`} onClick={() => setExpanded(null)}>
+      {expanded !== null && viewerBounds && (
+        <div className="lightbox" role="dialog" aria-label={`Enlarged frame ${expanded + 1}`} style={{ left: viewerBounds.left, top: viewerBounds.top, width: viewerBounds.width }} onClick={() => setExpanded(null)}>
           <button className="lightbox-close" type="button" onClick={() => setExpanded(null)} aria-label="Close image viewer"><Icon icon="lucide:x" /></button>
           <button className="lightbox-arrow left" type="button" onClick={(event) => { event.stopPropagation(); setExpanded((expanded + images.length - 1) % images.length) }} aria-label="Previous frame"><Icon icon="lucide:arrow-left" /></button>
           <img src={images[expanded]} alt={`Enlarged keyframe ${expanded + 1}`} onClick={(event) => event.stopPropagation()} />

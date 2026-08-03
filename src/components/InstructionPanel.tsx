@@ -13,7 +13,7 @@ export function InstructionPanel({ sections, effects, annotationPrompt }: Instru
   return (
     <section className={`instruction-panel ${open ? 'is-open' : ''}`}>
       <button type="button" className="instruction-toggle" onClick={() => setOpen((value) => !value)} aria-expanded={open}>
-        <span className="instruction-title"><Icon icon="lucide:notebook-tabs" /><strong>Working instructions</strong><small>{annotationPrompt}</small></span>
+        <span className="instruction-title"><Icon icon="lucide:notebook-tabs" /><strong>Working instruction</strong><small>{annotationPrompt}</small></span>
         <span className="instruction-hint" aria-hidden="true"><Icon icon={open ? 'lucide:chevron-up' : 'lucide:chevron-down'} /></span>
       </button>
       {open && (
@@ -30,7 +30,7 @@ export function InstructionPanel({ sections, effects, annotationPrompt }: Instru
             <div className="effect-glossary-heading">
               <div>
                 <h3 id="effect-glossary-title">Supported animation effects</h3>
-                <p>Choose exactly one defined effect that best matches the sketches.</p>
+                <p>Choose exactly one effect that best matches the sketches.</p>
               </div>
             </div>
             <div className="effect-glossary-grid">
